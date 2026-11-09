@@ -14,98 +14,257 @@
 
         :root {
             --primary-color: #ff6b6b;
+            --primary-hover: #e55a5a;
             --secondary-color: #4CAF50;
-            --text-primary: #333;
-            --text-secondary: #666;
-            --text-muted: #999;
-            --border-color: #ddd;
-            --border-light: #eee;
-            --bg-primary: #fff;
-            --bg-secondary: #f5f5f5;
-            --shadow-sm: 0 2px 4px rgba(0,0,0,0.1);
-            --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
-            --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
-            --radius-sm: 4px;
-            --radius-md: 8px;
-            --radius-lg: 12px;
-            --transition: all 0.2s ease;
+            --secondary-hover: #3d8b40;
+            --text-primary: #1a1a2e;
+            --text-secondary: #4a4a68;
+            --text-muted: #8b8b9e;
+            --border-color: #e1e1eb;
+            --border-light: #f0f0f5;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f7f7fc;
+            --bg-tertiary: #ffffff;
+            --shadow-sm: 0 1px 3px rgba(26, 26, 46, 0.08);
+            --shadow-md: 0 4px 12px rgba(26, 26, 46, 0.1);
+            --shadow-lg: 0 12px 32px rgba(26, 26, 46, 0.12);
+            --shadow-xl: 0 20px 48px rgba(26, 26, 46, 0.15);
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+            --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --z-header: 50;
             --z-dropdown: 100;
             --z-modal: 1000;
             --z-toast: 1100;
+            --sidebar-width: 380px;
+        }
+
+        @media (max-width: 1024px) {
+            :root {
+                --sidebar-width: 100%;
+            }
+        }
+
+        html, body {
+            height: 100%;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans TC', sans-serif;
             background-color: var(--bg-secondary);
             color: var(--text-primary);
             line-height: 1.6;
             min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
-        .app {
+        #app {
             min-height: 100vh;
             display: flex;
             flex-direction: column;
         }
 
-        /* Header */
+        /* ============ Page Transitions ============ */
+        .page-enter-active,
+        .page-leave-active {
+            transition: var(--transition-slow);
+        }
+
+        .page-enter-from {
+            opacity: 0;
+            transform: translateX(30px);
+        }
+
+        .page-leave-to {
+            opacity: 0;
+            transform: translateX(-30px);
+        }
+
+        .fade-enter-active,
+        .fade-leave-active {
+            transition: var(--transition);
+        }
+
+        .fade-enter-from,
+        .fade-leave-to {
+            opacity: 0;
+        }
+
+        .slide-up-enter-active,
+        .slide-up-leave-active {
+            transition: var(--transition-slow);
+        }
+
+        .slide-up-enter-from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .slide-up-leave-to {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+
+        /* ============ Header ============ */
         .header {
-            background-color: var(--text-primary);
-            color: var(--bg-primary);
-            padding: 16px 24px;
+            background-color: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 14px 24px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             position: sticky;
             top: 0;
-            z-index: 50;
+            z-index: var(--z-header);
             box-shadow: var(--shadow-sm);
         }
 
-        .header h1 {
-            font-size: 1.5rem;
-            font-weight: 600;
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
         }
 
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--primary-color), #ff8e8e);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.1rem;
+        }
+
+        .logo-text {
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .header-center {
+            flex: 1;
+            max-width: 560px;
+            margin: 0 32px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* Search in Header */
+        .search-wrapper-header {
+            position: relative;
+            width: 100%;
+        }
+
+        .search-input-header {
+            width: 100%;
+            padding: 10px 16px 10px 44px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            font-size: 0.9rem;
+            background-color: var(--bg-secondary);
+            transition: var(--transition);
+        }
+
+        .search-input-header:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background-color: var(--bg-primary);
+            box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.12);
+        }
+
+        .search-icon-header {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 1rem;
+            pointer-events: none;
+        }
+
+        /* Cart Trigger */
         .cart-trigger {
             display: flex;
             align-items: center;
             gap: 8px;
             padding: 10px 16px;
-            background-color: var(--primary-color);
+            background-color: var(--text-primary);
             border: none;
             border-radius: var(--radius-md);
             color: var(--bg-primary);
             font-weight: 500;
+            font-size: 0.9rem;
             cursor: pointer;
             transition: var(--transition);
             position: relative;
+            white-space: nowrap;
         }
 
         .cart-trigger:hover {
-            background-color: #e55a5a;
+            background-color: #2a2a4a;
             transform: translateY(-1px);
             box-shadow: var(--shadow-md);
         }
 
         .cart-count {
             position: absolute;
-            top: -6px;
-            right: -6px;
-            min-width: 20px;
-            height: 20px;
-            background-color: var(--bg-primary);
-            color: var(--primary-color);
-            border-radius: 10px;
+            top: -4px;
+            right: -4px;
+            min-width: 18px;
+            height: 18px;
+            background-color: var(--primary-color);
+            color: var(--bg-primary);
+            border-radius: 9px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             font-weight: 700;
-            padding: 0 6px;
+            padding: 0 5px;
+            border: 2px solid var(--bg-primary);
         }
 
-        /* Main Content */
+        /* Back Button for Checkout/Success pages */
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 12px;
+            background: none;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .back-btn:hover {
+            background-color: var(--bg-secondary);
+            border-color: var(--text-muted);
+            color: var(--text-primary);
+        }
+
+        /* ============ Main Content ============ */
         .main-content {
             flex: 1;
             padding: 24px;
@@ -114,103 +273,50 @@
             width: 100%;
         }
 
-        /* Search Bar */
-        .search-section {
-            margin-bottom: 24px;
-        }
-
-        .search-wrapper {
-            position: relative;
-            max-width: 480px;
-        }
-
-        .search-input {
-            width: 100%;
-            padding: 14px 20px 14px 48px;
-            border: 2px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            font-size: 1rem;
-            background-color: var(--bg-primary);
-            transition: var(--transition);
-        }
-
-        .search-input:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.15);
-        }
-
-        .search-icon {
-            position: absolute;
-            left: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-muted);
-            font-size: 1.1rem;
-        }
-
-        .search-clear {
-            position: absolute;
-            right: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            color: var(--text-muted);
-            cursor: pointer;
-            padding: 4px;
+        /* ============ Products Page ============ */
+        .page-header {
             display: flex;
             align-items: center;
-            justify-content: center;
-            border-radius: var(--radius-sm);
-            transition: var(--transition);
+            justify-content: space-between;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 16px;
         }
 
-        .search-clear:hover {
-            background-color: var(--bg-secondary);
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: 700;
             color: var(--text-primary);
         }
 
         .results-count {
-            margin-top: 8px;
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-        }
-
-        /* Loading State */
-        .loading-state {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 60px 24px;
-            gap: 16px;
+            font-size: 0.9rem;
             color: var(--text-muted);
         }
 
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 3px solid var(--border-color);
-            border-top-color: var(--primary-color);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        .results-count strong {
+            color: var(--text-primary);
         }
 
         /* Products Grid */
         .products-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 20px;
         }
 
         @media (max-width: 640px) {
             .products-grid {
                 grid-template-columns: 1fr;
+            }
+            .header-center {
+                display: none;
+            }
+            .header {
+                padding: 12px 16px;
+            }
+            .main-content {
+                padding: 16px;
             }
         }
 
@@ -226,25 +332,40 @@
         }
 
         .product-card:hover {
-            transform: translateY(-4px);
+            transform: translateY(-6px);
             box-shadow: var(--shadow-lg);
-            border-color: var(--primary-color);
+            border-color: transparent;
+        }
+
+        .product-image-wrapper {
+            position: relative;
+            aspect-ratio: 1;
+            overflow: hidden;
+            background-color: var(--bg-secondary);
         }
 
         .product-image {
             width: 100%;
-            height: 200px;
-            background-color: var(--bg-secondary);
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+
+        .product-card:hover .product-image {
+            transform: scale(1.05);
+        }
+
+        .product-image-placeholder {
+            position: absolute;
+            inset: 0;
             display: flex;
             align-items: center;
             justify-content: center;
             color: var(--text-muted);
             font-size: 0.875rem;
-            position: relative;
-            overflow: hidden;
         }
 
-        .product-image::before {
+        .product-image-placeholder::before {
             content: '';
             position: absolute;
             inset: 0;
@@ -261,40 +382,75 @@
             100% { transform: translateX(100px); }
         }
 
+        .product-badge {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            padding: 4px 10px;
+            background-color: var(--primary-color);
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 600;
+            border-radius: var(--radius-sm);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
         .product-info {
-            padding: 16px;
+            padding: 18px;
             display: flex;
             flex-direction: column;
             flex: 1;
+        }
+
+        .product-category {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 6px;
         }
 
         .product-title {
             font-size: 1.1rem;
             font-weight: 600;
             color: var(--text-primary);
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
+            line-height: 1.4;
+        }
+
+        .product-price-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
         }
 
         .product-price {
-            font-size: 1.25rem;
+            font-size: 1.35rem;
             font-weight: 700;
             color: var(--primary-color);
-            margin-bottom: 16px;
+        }
+
+        .product-original-price {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            text-decoration: line-through;
         }
 
         .add-to-cart-btn {
             width: 100%;
-            padding: 12px 16px;
-            background-color: var(--secondary-color);
+            padding: 14px 16px;
+            background-color: var(--text-primary);
             color: var(--bg-primary);
             border: none;
             border-radius: var(--radius-md);
-            font-size: 1rem;
-            font-weight: 500;
+            font-size: 0.95rem;
+            font-weight: 600;
             cursor: pointer;
             transition: var(--transition);
             display: flex;
@@ -303,47 +459,86 @@
             gap: 8px;
         }
 
-        .add-to-cart-btn:hover {
-            background-color: #3d8b40;
+        .add-to-cart-btn:hover:not(:disabled) {
+            background-color: var(--primary-color);
             transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
         }
 
-        .add-to-cart-btn:active {
+        .add-to-cart-btn:active:not(:disabled) {
             transform: translateY(0);
         }
 
         .add-to-cart-btn.added {
-            background-color: var(--primary-color);
+            background-color: var(--secondary-color);
         }
 
         .add-to-cart-btn:disabled {
-            opacity: 0.6;
+            opacity: 0.5;
             cursor: not-allowed;
+        }
+
+        .btn-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         /* Empty State */
         .empty-state {
             grid-column: 1 / -1;
             text-align: center;
-            padding: 60px 24px;
+            padding: 80px 24px;
             color: var(--text-muted);
         }
 
         .empty-state-icon {
-            font-size: 3rem;
-            margin-bottom: 16px;
-            opacity: 0.5;
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.4;
         }
 
-        /* Cart Sidebar */
+        .empty-state-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        /* Loading State */
+        .loading-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 80px 24px;
+            gap: 16px;
+            color: var(--text-muted);
+        }
+
+        .spinner {
+            width: 44px;
+            height: 44px;
+            border: 3px solid var(--border-color);
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ============ Cart Sidebar ============ */
         .cart-overlay {
             position: fixed;
             inset: 0;
-            background-color: rgba(0, 0, 0, 0.5);
+            background-color: rgba(26, 26, 46, 0.5);
             z-index: calc(var(--z-modal) - 1);
             opacity: 0;
             visibility: hidden;
             transition: var(--transition);
+            backdrop-filter: blur(2px);
         }
 
         .cart-overlay.open {
@@ -359,10 +554,10 @@
             max-width: 420px;
             height: 100vh;
             background-color: var(--bg-primary);
-            box-shadow: var(--shadow-lg);
+            box-shadow: var(--shadow-xl);
             z-index: var(--z-modal);
             transform: translateX(100%);
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
             display: flex;
             flex-direction: column;
         }
@@ -412,14 +607,21 @@
 
         .cart-empty {
             text-align: center;
-            padding: 40px 0;
+            padding: 60px 0;
             color: var(--text-muted);
         }
 
         .cart-empty-icon {
-            font-size: 3rem;
+            font-size: 3.5rem;
             margin-bottom: 16px;
-            opacity: 0.5;
+            opacity: 0.4;
+        }
+
+        .cart-empty-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
         }
 
         .cart-items {
@@ -430,14 +632,14 @@
 
         .cart-item {
             display: flex;
-            gap: 12px;
-            padding: 12px 0;
+            gap: 14px;
+            padding: 14px 0;
             border-bottom: 1px solid var(--border-light);
         }
 
         .cart-item-image {
-            width: 70px;
-            height: 70px;
+            width: 80px;
+            height: 80px;
             background-color: var(--bg-secondary);
             border-radius: var(--radius-md);
             flex-shrink: 0;
@@ -446,6 +648,13 @@
             justify-content: center;
             color: var(--text-muted);
             font-size: 0.75rem;
+            overflow: hidden;
+        }
+
+        .cart-item-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         .cart-item-details {
@@ -454,7 +663,7 @@
         }
 
         .cart-item-title {
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             font-weight: 500;
             color: var(--text-primary);
             margin-bottom: 6px;
@@ -478,8 +687,8 @@
         }
 
         .quantity-btn {
-            width: 32px;
-            height: 32px;
+            width: 36px;
+            height: 36px;
             border: 1px solid var(--border-color);
             background: var(--bg-primary);
             border-radius: var(--radius-sm);
@@ -504,7 +713,7 @@
         }
 
         .quantity-display {
-            min-width: 36px;
+            min-width: 40px;
             text-align: center;
             font-weight: 600;
             font-size: 1rem;
@@ -513,7 +722,7 @@
         .cart-item-actions {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 6px;
         }
 
         .remove-item-btn {
@@ -523,6 +732,7 @@
             color: var(--text-secondary);
             border-radius: var(--radius-sm);
             font-size: 0.8rem;
+            font-weight: 500;
             cursor: pointer;
             transition: var(--transition);
         }
@@ -539,22 +749,34 @@
             background-color: var(--bg-secondary);
         }
 
-        .cart-total {
+        .cart-summary {
+            margin-bottom: 16px;
+        }
+
+        .cart-summary-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 16px;
-            font-size: 1.1rem;
+            margin-bottom: 10px;
+            font-size: 0.95rem;
         }
 
-        .total-label {
-            font-weight: 500;
-        }
-
-        .total-amount {
-            font-size: 1.5rem;
+        .cart-summary-row.total {
+            font-size: 1.25rem;
             font-weight: 700;
+            color: var(--text-primary);
+            padding-top: 12px;
+            border-top: 1px solid var(--border-color);
+            margin-top: 4px;
+        }
+
+        .cart-summary-row.total .label {
+            color: var(--text-secondary);
+        }
+
+        .cart-summary-row.total .value {
             color: var(--primary-color);
+            font-size: 1.5rem;
         }
 
         .checkout-btn {
@@ -571,8 +793,9 @@
         }
 
         .checkout-btn:hover:not(:disabled) {
-            background-color: #e55a5a;
+            background-color: var(--primary-hover);
             transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
         }
 
         .checkout-btn:disabled {
@@ -580,7 +803,607 @@
             cursor: not-allowed;
         }
 
-        /* Toast Notifications */
+        /* ============ Checkout Page ============ */
+        .checkout-page {
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .checkout-layout {
+            display: grid;
+            grid-template-columns: 1fr var(--sidebar-width);
+            gap: 32px;
+            align-items: start;
+        }
+
+        @media (max-width: 1024px) {
+            .checkout-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .checkout-main {
+            min-width: 0;
+        }
+
+        .checkout-sidebar {
+            position: sticky;
+            top: 100px;
+            height: fit-content;
+        }
+
+        @media (max-width: 1024px) {
+            .checkout-sidebar {
+                position: static;
+            }
+        }
+
+        .checkout-section {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 28px;
+            margin-bottom: 24px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .section-subtitle {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .step-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            background: var(--bg-secondary);
+            border-radius: var(--radius-md);
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .step-indicator .current {
+            color: var(--primary-color);
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .form-label .required {
+            color: var(--primary-color);
+            margin-left: 2px;
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            font-size: 1rem;
+            font-family: inherit;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            transition: var(--transition);
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.12);
+        }
+
+        .form-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .form-input.error,
+        .form-select.error {
+            border-color: var(--primary-color);
+        }
+
+        .form-error {
+            font-size: 0.8rem;
+            color: var(--primary-color);
+            margin-top: 6px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        @media (max-width: 480px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Address Form */
+        .address-form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        @media (max-width: 480px) {
+            .address-form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .form-full-width {
+            grid-column: 1 / -1;
+        }
+
+        /* Payment Methods */
+        .payment-methods {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .payment-method {
+            position: relative;
+        }
+
+        .payment-method input {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .payment-method-label {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 16px 18px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: var(--transition);
+            background: var(--bg-primary);
+        }
+
+        .payment-method input:checked + .payment-method-label {
+            border-color: var(--primary-color);
+            background: #fff5f5;
+            box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.1);
+        }
+
+        .payment-method-label:hover {
+            border-color: var(--text-muted);
+        }
+
+        .payment-method-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--radius-sm);
+            background: var(--bg-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+
+        .payment-method input:checked + .payment-method-label .payment-method-icon {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .payment-method-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .payment-method-name {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+        }
+
+        .payment-method-desc {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .payment-method-radio {
+            width: 22px;
+            height: 22px;
+            border: 2px solid var(--border-color);
+            border-radius: 50%;
+            position: relative;
+            flex-shrink: 0;
+            transition: var(--transition);
+        }
+
+        .payment-method input:checked + .payment-method-label .payment-method-radio {
+            border-color: var(--primary-color);
+        }
+
+        .payment-method-radio::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            width: 10px;
+            height: 10px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            transition: transform 0.2s ease;
+        }
+
+        .payment-method input:checked + .payment-method-label .payment-method-radio::after {
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        /* Credit Card Fields (conditional) */
+        .credit-card-fields {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border-light);
+            animation: slideDown 0.25s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card-inputs-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 12px;
+        }
+
+        @media (max-width: 480px) {
+            .card-inputs-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Order Summary Sidebar */
+        .order-summary {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+        }
+
+        .order-summary-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .order-items {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin-bottom: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .order-item {
+            display: flex;
+            gap: 12px;
+        }
+
+        .order-item-image {
+            width: 56px;
+            height: 56px;
+            background-color: var(--bg-secondary);
+            border-radius: var(--radius-sm);
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .order-item-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .order-item-details {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .order-item-name {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .order-item-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .order-item-qty {
+            background: var(--bg-secondary);
+            padding: 2px 8px;
+            border-radius: var(--radius-sm);
+        }
+
+        .order-item-price {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            text-align: right;
+            white-space: nowrap;
+        }
+
+        .order-totals {
+            border-top: 1px solid var(--border-light);
+            padding-top: 20px;
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            font-size: 0.9rem;
+        }
+
+        .total-row.final {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            padding-top: 12px;
+            border-top: 1px solid var(--border-light);
+            margin-top: 4px;
+        }
+
+        .total-row.final .value {
+            color: var(--primary-color);
+        }
+
+        .total-label {
+            color: var(--text-secondary);
+        }
+
+        .total-value {
+            font-weight: 600;
+        }
+
+        .free-shipping {
+            color: var(--secondary-color);
+            font-weight: 500;
+        }
+
+        .checkout-submit-btn {
+            width: 100%;
+            margin-top: 24px;
+            padding: 18px;
+            background: linear-gradient(135deg, var(--primary-color), #ff8e8e);
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 1.05rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .checkout-submit-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .checkout-submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .secure-notice {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 16px;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .secure-notice svg {
+            color: var(--secondary-color);
+        }
+
+        /* ============ Success Page ============ */
+        .success-page {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: calc(100vh - 72px);
+            padding: 40px 24px;
+        }
+
+        .success-card {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            padding: 48px;
+            max-width: 520px;
+            width: 100%;
+            text-align: center;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .success-icon {
+            width: 96px;
+            height: 96px;
+            margin: 0 auto 24px;
+            background: linear-gradient(135deg, var(--secondary-color), #6fd66f);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: scaleIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes scaleIn {
+            from { transform: scale(0); }
+            to { transform: scale(1); }
+        }
+
+        .success-icon svg {
+            width: 48px;
+            height: 48px;
+            color: white;
+        }
+
+        .success-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+        }
+
+        .success-subtitle {
+            font-size: 1.05rem;
+            color: var(--text-secondary);
+            margin-bottom: 32px;
+        }
+
+        .order-info {
+            background: var(--bg-secondary);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            margin-bottom: 28px;
+            text-align: left;
+        }
+
+        .order-info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .order-info-row:last-child {
+            border-bottom: none;
+        }
+
+        .order-info-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .order-info-value {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .order-info-value.highlight {
+            color: var(--primary-color);
+            font-size: 1.1rem;
+        }
+
+        .success-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .success-btn-primary {
+            padding: 16px 24px;
+            background: var(--text-primary);
+            color: var(--bg-primary);
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .success-btn-primary:hover {
+            background: var(--primary-color);
+        }
+
+        .success-btn-secondary {
+            padding: 16px 24px;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .success-btn-secondary:hover {
+            background: var(--border-light);
+        }
+
+        /* ============ Toast Notifications ============ */
         .toast-container {
             position: fixed;
             bottom: 24px;
@@ -590,6 +1413,14 @@
             flex-direction: column;
             gap: 10px;
             pointer-events: none;
+        }
+
+        @media (max-width: 480px) {
+            .toast-container {
+                left: 16px;
+                right: 16px;
+                bottom: 16px;
+            }
         }
 
         .toast {
@@ -603,7 +1434,7 @@
             box-shadow: var(--shadow-lg);
             border-left: 4px solid var(--secondary-color);
             animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            max-width: 360px;
+            max-width: 380px;
         }
 
         .toast.removing {
@@ -615,25 +1446,13 @@
         }
 
         @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateX(100%);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
+            from { opacity: 0; transform: translateX(100%); }
+            to { opacity: 1; transform: translateX(0); }
         }
 
         @keyframes slideOut {
-            from {
-                opacity: 1;
-                transform: translateX(0);
-            }
-            to {
-                opacity: 0;
-                transform: translateX(100%);
-            }
+            from { opacity: 1; transform: translateX(0); }
+            to { opacity: 0; transform: translateX(100%); }
         }
 
         .toast-icon {
@@ -641,13 +1460,8 @@
             flex-shrink: 0;
         }
 
-        .toast.success .toast-icon {
-            color: var(--secondary-color);
-        }
-
-        .toast.error .toast-icon {
-            color: var(--primary-color);
-        }
+        .toast.success .toast-icon { color: var(--secondary-color); }
+        .toast.error .toast-icon { color: var(--primary-color); }
 
         .toast-message {
             flex: 1;
@@ -670,11 +1484,11 @@
             color: var(--text-primary);
         }
 
-        /* Modal Dialog */
+        /* ============ Modals ============ */
         .modal-overlay {
             position: fixed;
             inset: 0;
-            background-color: rgba(0, 0, 0, 0.6);
+            background-color: rgba(26, 26, 46, 0.6);
             z-index: var(--z-modal);
             display: flex;
             align-items: center;
@@ -683,6 +1497,7 @@
             opacity: 0;
             visibility: hidden;
             transition: var(--transition);
+            backdrop-filter: blur(4px);
         }
 
         .modal-overlay.open {
@@ -693,11 +1508,11 @@
         .modal {
             background-color: var(--bg-primary);
             border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-lg);
-            max-width: 420px;
+            box-shadow: var(--shadow-xl);
+            max-width: 440px;
             width: 100%;
-            transform: scale(0.9) translateY(20px);
-            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: scale(0.92) translateY(20px);
+            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .modal-overlay.open .modal {
@@ -749,7 +1564,7 @@
         }
 
         .modal-btn-secondary:hover {
-            background-color: var(--border-color);
+            background-color: var(--border-light);
         }
 
         .modal-btn-primary {
@@ -758,7 +1573,7 @@
         }
 
         .modal-btn-primary:hover:not(:disabled) {
-            background-color: #e55a5a;
+            background-color: var(--primary-hover);
         }
 
         .modal-btn-primary:disabled {
@@ -772,16 +1587,27 @@
         }
 
         .modal-btn-danger:hover:not(:disabled) {
-            background-color: #e55a5a;
+            background-color: var(--primary-hover);
         }
 
-        /* Focus visible for accessibility */
+        /* ============ Accessibility & Utilities ============ */
         *:focus-visible {
             outline: 2px solid var(--primary-color);
             outline-offset: 2px;
         }
 
-        /* Scrollbar styling */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
         ::-webkit-scrollbar {
             width: 8px;
             height: 8px;
@@ -799,173 +1625,56 @@
         ::-webkit-scrollbar-thumb:hover {
             background: var(--text-muted);
         }
+
+        /* Print styles for order confirmation */
+        @media print {
+            .header, .cart-sidebar, .cart-overlay, .toast-container, .modal-overlay,
+            .checkout-submit-btn, .success-actions, .back-btn {
+                display: none !important;
+            }
+            .success-card {
+                box-shadow: none;
+                border: 1px solid #000;
+            }
+        }
     </style>
 </head>
 <body>
     <div id="app">
-        <header class="header">
-            <h1>精品商店</h1>
-            <button class="cart-trigger" @click="openCart" aria-label="打開購物車">
-                🛒 購物車
-                <span class="cart-count" v-if="totalQuantity > 0">{{ totalQuantity }}</span>
-            </button>
-        </header>
+        <!-- Header (shown on all pages except success) -->
+        <header class="header" v-if="currentPage !== 'success'">
+            <div class="header-left">
+                <a href="#" class="logo" @click.prevent="goHome">
+                    <span class="logo-icon">🛍️</span>
+                    <span class="logo-text">精品商店</span>
+                </a>
+            </div>
 
-        <main class="main-content">
-            <!-- Search Section -->
-            <section class="search-section">
-                <div class="search-wrapper">
-                    <span class="search-icon" aria-hidden="true">🔍</span>
+            <div class="header-center" v-if="currentPage === 'products'">
+                <div class="search-wrapper-header">
+                    <span class="search-icon-header" aria-hidden="true">🔍</span>
                     <input
                         type="search"
-                        class="search-input"
+                        class="search-input-header"
                         placeholder="搜尋商品..."
                         v-model="searchQuery"
                         @input="debouncedSearch"
                         aria-label="搜尋商品"
                         autocomplete="off"
                     >
-                    <button
-                        class="search-clear"
-                        v-if="searchQuery"
-                        @click="clearSearch"
-                        aria-label="清除搜尋"
-                    >
-                        ✕
-                    </button>
-                </div>
-                <p class="results-count" v-if="searchQuery">
-                    找到 <strong>{{ filteredProducts.length }}</strong> 個商品 (共 {{ products.length }} 個)
-                </p>
-            </section>
-
-            <!-- Loading State -->
-            <div class="loading-state" v-if="isLoading">
-                <div class="spinner" aria-hidden="true"></div>
-                <p>載入商品中...</p>
-            </div>
-
-            <!-- Products Grid -->
-            <section aria-label="商品列表">
-                <div class="products-grid" v-if="!isLoading">
-                    <div
-                        class="product-card"
-                        v-for="product in filteredProducts"
-                        :key="product.id"
-                    >
-                        <div class="product-image" aria-hidden="true">
-                            <span v-if="!product.imageLoaded">圖片載入中...</span>
-                            <img
-                                v-else
-                                :src="product.image"
-                                :alt="product.name"
-                                loading="lazy"
-                            >
-                        </div>
-                        <div class="product-info">
-                            <h3 class="product-title">{{ product.name }}</h3>
-                            <div class="product-price">NT$ {{ product.price.toLocaleString() }}</div>
-                            <button
-                                class="add-to-cart-btn"
-                                :class="{ added: justAdded === product.id }"
-                                @click="addToCart(product)"
-                                :disabled="addingToCart === product.id"
-                                aria-label="將 {{ product.name }} 加入購物車"
-                            >
-                                <span v-if="addingToCart === product.id">加入中...</span>
-                                <span v-else-if="justAdded === product.id">✓ 已加入</span>
-                                <span v-else>加入購物車</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="empty-state" v-if="!isLoading && filteredProducts.length === 0">
-                        <div class="empty-state-icon">🔍</div>
-                        <p v-if="searchQuery">找不到符合「{{ searchQuery }}」的商品</p>
-                        <p v-else>目前沒有商品</p>
-                    </div>
-                </div>
-            </section>
-        </main>
-
-        <!-- Cart Overlay -->
-        <div class="cart-overlay" :class="{ open: isCartOpen }" @click="closeCart" aria-hidden="true"></div>
-
-        <!-- Cart Sidebar -->
-        <aside
-            class="cart-sidebar"
-            :class="{ open: isCartOpen }"
-            role="dialog"
-            aria-label="購物車"
-            aria-modal="true"
-        >
-            <div class="cart-header">
-                <h2>購物車 ({{ cartItems.length }})</h2>
-                <button class="close-cart" @click="closeCart" aria-label="關閉購物車">×</button>
-            </div>
-
-            <div class="cart-content">
-                <div class="cart-empty" v-if="cartItems.length === 0">
-                    <div class="cart-empty-icon">🛒</div>
-                    <p>購物車是空的</p>
-                    <p style="font-size: 0.875rem; margin-top: 8px;">挑選喜歡的商品加入購物車吧！</p>
-                </div>
-
-                <div class="cart-items" v-else>
-                    <div class="cart-item" v-for="item in cartItems" :key="item.product.id">
-                        <div class="cart-item-image" aria-hidden="true">圖片</div>
-                        <div class="cart-item-details">
-                            <div class="cart-item-title">{{ item.product.name }}</div>
-                            <div class="cart-item-price">
-                                NT$ {{ item.product.price.toLocaleString() }} × {{ item.quantity }}
-                            </div>
-                            <div class="quantity-controls">
-                                <button
-                                    class="quantity-btn"
-                                    @click="updateQuantity(item.product.id, -1)"
-                                    :disabled="item.quantity <= 1"
-                                    aria-label="減少 {{ item.product.name }} 數量"
-                                >
-                                    −
-                                </button>
-                                <span class="quantity-display">{{ item.quantity }}</span>
-                                <button
-                                    class="quantity-btn"
-                                    @click="updateQuantity(item.product.id, 1)"
-                                    aria-label="增加 {{ item.product.name }} 數量"
-                                >
-                                    +
-                                </button>
-                            </div>
-                        </div>
-                        <div class="cart-item-actions">
-                            <button
-                                class="remove-item-btn"
-                                @click="confirmRemoveItem(item.product)"
-                                aria-label="移除 {{ item.product.name }}"
-                            >
-                                移除
-                            </button>
-                        </div>
-                    </div>
                 </div>
             </div>
 
-            <div class="cart-footer" v-if="cartItems.length > 0">
-                <div class="cart-total">
-                    <span class="total-label">總計 ({{ totalQuantity }} 件)</span>
-                    <span class="total-amount">NT$ {{ totalPrice.toLocaleString() }}</span>
-                </div>
-                <button
-                    class="checkout-btn"
-                    @click="confirmCheckout"
-                    :disabled="isCheckingOut"
-                >
-                    <span v-if="isCheckingOut">結帳中...</span>
-                    <span v-else>結帳 - NT$ {{ totalPrice.toLocaleString() }}</span>
+            <div class="header-right">
+                <button class="back-btn" v-if="currentPage === 'checkout'" @click="goBackToCart">
+                    ← 返回購物車
+                </button>
+                <button class="cart-trigger" @click="openCart" aria-label="打開購物車">
+                    🛒 購物車
+                    <span class="cart-count" v-if="totalQuantity > 0">{{ totalQuantity }}</span>
                 </button>
             </div>
-        </aside>
+        </header>
 
         <!-- Toast Container -->
         <div class="toast-container" aria-live="polite" aria-atomic="true">
@@ -987,8 +1696,495 @@
             </transition-group>
         </div>
 
+        <!-- Main Content with Page Transitions -->
+        <main class="main-content">
+            <transition name="page" mode="out-in">
+                <!-- Products Page -->
+                <div class="products-page" key="products" v-if="currentPage === 'products'">
+                    <div class="page-header">
+                        <h1 class="page-title">所有商品</h1>
+                        <span class="results-count" v-if="searchQuery">
+                            找到 <strong>{{ filteredProducts.length }}</strong> 個商品 (共 {{ products.length }} 個)
+                        </span>
+                    </div>
+
+                    <div class="loading-state" v-if="isLoading">
+                        <div class="spinner" aria-hidden="true"></div>
+                        <p>載入商品中...</p>
+                    </div>
+
+                    <section aria-label="商品列表">
+                        <div class="products-grid" v-if="!isLoading">
+                            <div
+                                class="product-card"
+                                v-for="product in filteredProducts"
+                                :key="product.id"
+                            >
+                                <div class="product-image-wrapper">
+                                    <img
+                                        v-if="product.imageLoaded"
+                                        class="product-image"
+                                        :src="product.image"
+                                        :alt="product.name"
+                                        loading="lazy"
+                                        @load="handleImageLoad(product)"
+                                    >
+                                    <div class="product-image-placeholder" v-else aria-hidden="true">
+                                        圖片載入中...
+                                    </div>
+                                    <span class="product-badge" v-if="product.badge">{{ product.badge }}</span>
+                                </div>
+                                <div class="product-info">
+                                    <span class="product-category">{{ product.category }}</span>
+                                    <h3 class="product-title">{{ product.name }}</h3>
+                                    <div class="product-price-row">
+                                        <span class="product-price">NT$ {{ product.price.toLocaleString() }}</span>
+                                        <span class="product-original-price" v-if="product.originalPrice">NT$ {{ product.originalPrice.toLocaleString() }}</span>
+                                    </div>
+                                    <button
+                                        class="add-to-cart-btn"
+                                        :class="{ added: justAdded === product.id }"
+                                        @click="addToCart(product)"
+                                        :disabled="addingToCart === product.id"
+                                        :aria-label="`將 ${product.name} 加入購物車`"
+                                    >
+                                        <span v-if="addingToCart === product.id">加入中...</span>
+                                        <span v-else-if="justAdded === product.id">
+                                            <span class="btn-icon">✓</span> 已加入
+                                        </span>
+                                        <span v-else>
+                                            <span class="btn-icon">+</span> 加入購物車
+                                        </span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="empty-state" v-if="!isLoading && filteredProducts.length === 0">
+                                <div class="empty-state-icon">🔍</div>
+                                <h3 class="empty-state-title" v-if="searchQuery">找不到符合「{{ searchQuery }}」的商品</h3>
+                                <h3 class="empty-state-title" v-else>目前沒有商品</h3>
+                                <p v-if="searchQuery">試試其他關鍵字或 <button @click="clearSearch" style="color: var(--primary-color); background: none; border: none; cursor: pointer; text-decoration: underline;">清除搜尋</button></p>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- Checkout Page -->
+                <div class="checkout-page" key="checkout" v-else-if="currentPage === 'checkout'">
+                    <div class="checkout-layout">
+                        <div class="checkout-main">
+                            <!-- Shipping Address -->
+                            <section class="checkout-section" aria-labelledby="shipping-title">
+                                <div class="section-header">
+                                    <h2 class="section-title" id="shipping-title">配送地址</h2>
+                                    <span class="step-indicator">
+                                        步驟 <span class="current">1</span> / 2
+                                    </span>
+                                </div>
+
+                                <form @submit.prevent="validateAndProceed" novalidate>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label class="form-label" for="recipientName">收件人姓名 <span class="required">*</span></label>
+                                            <input
+                                                type="text"
+                                                id="recipientName"
+                                                class="form-input"
+                                                :class="{ error: errors.recipientName }"
+                                                v-model="checkoutForm.recipientName"
+                                                placeholder="請輸入收件人姓名"
+                                                autocomplete="name"
+                                                required
+                                            >
+                                            <p class="form-error" v-if="errors.recipientName">請輸入收件人姓名</p>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label" for="phone">手機號碼 <span class="required">*</span></label>
+                                            <input
+                                                type="tel"
+                                                id="phone"
+                                                class="form-input"
+                                                :class="{ error: errors.phone }"
+                                                v-model="checkoutForm.phone"
+                                                placeholder="09xx-xxx-xxx"
+                                                autocomplete="tel"
+                                                required
+                                            >
+                                            <p class="form-error" v-if="errors.phone">請輸入有效的手機號碼</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="form-label" for="email">電子郵件 <span class="required">*</span></label>
+                                        <input
+                                            type="email"
+                                            id="email"
+                                            class="form-input"
+                                            :class="{ error: errors.email }"
+                                            v-model="checkoutForm.email"
+                                            placeholder="example@email.com"
+                                            autocomplete="email"
+                                            required
+                                        >
+                                        <p class="form-error" v-if="errors.email">請輸入有效的電子郵件</p>
+                                    </div>
+
+                                    <div class="address-form-grid">
+                                        <div class="form-group">
+                                            <label class="form-label" for="county">縣市 <span class="required">*</span></label>
+                                            <select
+                                                id="county"
+                                                class="form-select"
+                                                :class="{ error: errors.county }"
+                                                v-model="checkoutForm.county"
+                                                required
+                                            >
+                                                <option value="">請選擇縣市</option>
+                                                <option v-for="c in counties" :key="c" :value="c">{{ c }}</option>
+                                            </select>
+                                            <p class="form-error" v-if="errors.county">請選擇縣市</p>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label" for="district">鄉鎮市區 <span class="required">*</span></label>
+                                            <select
+                                                id="district"
+                                                class="form-select"
+                                                :class="{ error: errors.district }"
+                                                v-model="checkoutForm.district"
+                                                required
+                                            >
+                                                <option value="">請選擇鄉鎮市區</option>
+                                                <option v-for="d in districts" :key="d" :value="d">{{ d }}</option>
+                                            </select>
+                                            <p class="form-error" v-if="errors.district">請選擇鄉鎮市區</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group form-full-width">
+                                        <label class="form-label" for="address">詳細地址 <span class="required">*</span></label>
+                                        <input
+                                            type="text"
+                                            id="address"
+                                            class="form-input"
+                                            :class="{ error: errors.address }"
+                                            v-model="checkoutForm.address"
+                                            placeholder="路名、門牌、大樓名稱等"
+                                            autocomplete="street-address"
+                                            required
+                                        >
+                                        <p class="form-error" v-if="errors.address">請輸入詳細地址</p>
+                                    </div>
+
+                                    <div class="form-group form-full-width">
+                                        <label class="form-label" for="notes">備註 (選填)</label>
+                                        <textarea
+                                            id="notes"
+                                            class="form-textarea"
+                                            v-model="checkoutForm.notes"
+                                            placeholder="配送指示、門禁密碼等..."
+                                            rows="3"
+                                        ></textarea>
+                                    </div>
+                                </form>
+                            </section>
+
+                            <!-- Payment Method -->
+                            <section class="checkout-section" aria-labelledby="payment-title">
+                                <div class="section-header">
+                                    <h2 class="section-title" id="payment-title">付款方式</h2>
+                                    <span class="step-indicator">
+                                        步驟 <span class="current">2</span> / 2
+                                    </span>
+                                </div>
+
+                                <div class="payment-methods">
+                                    <label class="payment-method" v-for="method in paymentMethods" :key="method.id">
+                                        <input
+                                            type="radio"
+                                            name="paymentMethod"
+                                            :value="method.id"
+                                            v-model="checkoutForm.paymentMethod"
+                                        >
+                                        <span class="payment-method-label">
+                                            <span class="payment-method-icon">
+                                                <span v-html="method.icon"></span>
+                                            </span>
+                                            <div class="payment-method-info">
+                                                <div class="payment-method-name">{{ method.name }}</div>
+                                                <div class="payment-method-desc">{{ method.description }}</div>
+                                            </div>
+                                            <span class="payment-method-radio"></span>
+                                        </span>
+                                    </label>
+                                </div>
+
+                                <!-- Credit Card Fields -->
+                                <div class="credit-card-fields" v-if="checkoutForm.paymentMethod === 'credit_card'">
+                                    <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 16px; color: var(--text-primary);">信用卡資訊</h3>
+                                    <div class="form-group">
+                                        <label class="form-label" for="cardNumber">卡號 <span class="required">*</span></label>
+                                        <input
+                                            type="text"
+                                            id="cardNumber"
+                                            class="form-input"
+                                            :class="{ error: errors.cardNumber }"
+                                            v-model="checkoutForm.cardNumber"
+                                            placeholder="1234 5678 9012 3456"
+                                            maxlength="19"
+                                            @input="formatCardNumber"
+                                            autocomplete="cc-number"
+                                        >
+                                        <p class="form-error" v-if="errors.cardNumber">請輸入有效的卡號</p>
+                                    </div>
+                                    <div class="card-inputs-row">
+                                        <div class="form-group">
+                                            <label class="form-label" for="cardExpiry">有效期限 <span class="required">*</span></label>
+                                            <input
+                                                type="text"
+                                                id="cardExpiry"
+                                                class="form-input"
+                                                :class="{ error: errors.cardExpiry }"
+                                                v-model="checkoutForm.cardExpiry"
+                                                placeholder="MM/YY"
+                                                maxlength="5"
+                                                @input="formatCardExpiry"
+                                                autocomplete="cc-exp"
+                                            >
+                                            <p class="form-error" v-if="errors.cardExpiry">請輸入有效期限</p>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label" for="cardCvc">CVC <span class="required">*</span></label>
+                                            <input
+                                                type="text"
+                                                id="cardCvc"
+                                                class="form-input"
+                                                :class="{ error: errors.cardCvc }"
+                                                v-model="checkoutForm.cardCvc"
+                                                placeholder="123"
+                                                maxlength="4"
+                                                autocomplete="cc-csc"
+                                            >
+                                            <p class="form-error" v-if="errors.cardCvc">請輸入 CVC</p>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label" for="cardName">持卡人姓名 <span class="required">*</span></label>
+                                            <input
+                                                type="text"
+                                                id="cardName"
+                                                class="form-input"
+                                                :class="{ error: errors.cardName }"
+                                                v-model="checkoutForm.cardName"
+                                                placeholder="持卡人英文全名"
+                                                autocomplete="cc-name"
+                                            >
+                                            <p class="form-error" v-if="errors.cardName">請輸入持卡人姓名</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
+
+                        <!-- Order Summary Sidebar -->
+                        <aside class="checkout-sidebar">
+                            <div class="order-summary">
+                                <h3 class="order-summary-title">訂單摘要</h3>
+
+                                <div class="order-items">
+                                    <div class="order-item" v-for="item in cartItems" :key="item.product.id">
+                                        <div class="order-item-image">
+                                            <img :src="item.product.image" :alt="item.product.name" loading="lazy">
+                                        </div>
+                                        <div class="order-item-details">
+                                            <div class="order-item-name">{{ item.product.name }}</div>
+                                            <div class="order-item-meta">
+                                                <span class="order-item-qty">× {{ item.quantity }}</span>
+                                            </div>
+                                        </div>
+                                        <div class="order-item-price">NT$ {{ (item.product.price * item.quantity).toLocaleString() }}</div>
+                                    </div>
+                                </div>
+
+                                <div class="order-totals">
+                                    <div class="total-row">
+                                        <span class="total-label">商品小計 ({{ totalQuantity }} 件)</span>
+                                        <span class="total-value">NT$ {{ subtotal.toLocaleString() }}</span>
+                                    </div>
+                                    <div class="total-row">
+                                        <span class="total-label">運費</span>
+                                        <span class="total-value free-shipping" v-if="subtotal >= 3000">免運費</span>
+                                        <span class="total-value" v-else>NT$ 120</span>
+                                    </div>
+                                    <div class="total-row final">
+                                        <span class="total-label">總計</span>
+                                        <span class="total-value">NT$ {{ grandTotal.toLocaleString() }}</span>
+                                    </div>
+                                </div>
+
+                                <button
+                                    class="checkout-submit-btn"
+                                    @click="submitOrder"
+                                    :disabled="isSubmittingOrder"
+                                >
+                                    <span v-if="isSubmittingOrder">處理中...</span>
+                                    <span v-else>
+                                        <span>確認下單</span>
+                                        <strong>NT$ {{ grandTotal.toLocaleString() }}</strong>
+                                    </span>
+                                </button>
+
+                                <div class="secure-notice">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                                    <span>安全加密交易 • 支援退換貨服務</span>
+                                </div>
+                            </div>
+                        </aside>
+                    </div>
+                </div>
+
+                <!-- Success Page -->
+                <div class="success-page" key="success" v-else-if="currentPage === 'success'">
+                    <div class="success-card">
+                        <div class="success-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                        </div>
+                        <h1 class="success-title">訂單成立！</h1>
+                        <p class="success-subtitle">感謝您的購買，訂單已確認並開始處理</p>
+
+                        <div class="order-info">
+                            <div class="order-info-row">
+                                <span class="order-info-label">訂單編號</span>
+                                <span class="order-info-value highlight">{{ orderConfirmation.orderNumber }}</span>
+                            </div>
+                            <div class="order-info-row">
+                                <span class="order-info-label">下單時間</span>
+                                <span class="order-info-value">{{ orderConfirmation.orderDate }}</span>
+                            </div>
+                            <div class="order-info-row">
+                                <span class="order-info-label">付款方式</span>
+                                <span class="order-info-value">{{ orderConfirmation.paymentMethod }}</span>
+                            </div>
+                            <div class="order-info-row">
+                                <span class="order-info-label">配送地址</span>
+                                <span class="order-info-value">{{ orderConfirmation.shippingAddress }}</span>
+                            </div>
+                            <div class="order-info-row">
+                                <span class="order-info-label">商品總計</span>
+                                <span class="order-info-value highlight">NT$ {{ orderConfirmation.total.toLocaleString() }}</span>
+                            </div>
+                        </div>
+
+                        <div class="success-actions">
+                            <button class="success-btn-primary" @click="goHome">
+                                回首頁繼續購物
+                            </button>
+                            <button class="success-btn-secondary" @click="downloadInvoice">
+                                下載電子發票
+                            </button>
+                            <button class="success-btn-secondary" @click="viewOrderHistory">
+                                查看訂單紀錄
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </transition>
+        </main>
+
+        <!-- Cart Overlay -->
+        <div class="cart-overlay" :class="{ open: isCartOpen }" @click="closeCart" aria-hidden="true"></div>
+
+        <!-- Cart Sidebar -->
+        <aside
+            class="cart-sidebar"
+            :class="{ open: isCartOpen }"
+            role="dialog"
+            aria-label="購物車"
+            aria-modal="true"
+        >
+            <div class="cart-header">
+                <h2>購物車 ({{ cartItems.length }})</h2>
+                <button class="close-cart" @click="closeCart" aria-label="關閉購物車">×</button>
+            </div>
+
+            <div class="cart-content">
+                <div class="cart-empty" v-if="cartItems.length === 0">
+                    <div class="cart-empty-icon">🛒</div>
+                    <p class="cart-empty-title">購物車是空的</p>
+                    <p style="font-size: 0.875rem; margin-top: 8px;">挑選喜歡的商品加入購物車吧！</p>
+                </div>
+
+                <div class="cart-items" v-else>
+                    <div class="cart-item" v-for="item in cartItems" :key="item.product.id">
+                        <div class="cart-item-image">
+                            <img :src="item.product.image" :alt="item.product.name" loading="lazy">
+                        </div>
+                        <div class="cart-item-details">
+                            <div class="cart-item-title">{{ item.product.name }}</div>
+                            <div class="cart-item-price">
+                                NT$ {{ item.product.price.toLocaleString() }} × {{ item.quantity }}
+                            </div>
+                            <div class="quantity-controls">
+                                <button
+                                    class="quantity-btn"
+                                    @click="updateQuantity(item.product.id, -1)"
+                                    :disabled="item.quantity <= 1"
+                                    :aria-label="`減少 ${item.product.name} 數量`"
+                                >
+                                    −
+                                </button>
+                                <span class="quantity-display">{{ item.quantity }}</span>
+                                <button
+                                    class="quantity-btn"
+                                    @click="updateQuantity(item.product.id, 1)"
+                                    :aria-label="`增加 ${item.product.name} 數量`"
+                                >
+                                    +
+                                </button>
+                            </div>
+                        </div>
+                        <div class="cart-item-actions">
+                            <button
+                                class="remove-item-btn"
+                                @click="confirmRemoveItem(item.product)"
+                                :aria-label="`移除 ${item.product.name}`"
+                            >
+                                移除
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cart-footer" v-if="cartItems.length > 0">
+                <div class="cart-summary">
+                    <div class="cart-summary-row">
+                        <span class="label">商品小計 ({{ totalQuantity }} 件)</span>
+                        <span class="value">NT$ {{ subtotal.toLocaleString() }}</span>
+                    </div>
+                    <div class="cart-summary-row">
+                        <span class="label">運費</span>
+                        <span class="value free-shipping" v-if="subtotal >= 3000">免運費</span>
+                        <span class="value" v-else>NT$ 120</span>
+                    </div>
+                    <div class="cart-summary-row total">
+                        <span class="label">總計</span>
+                        <span class="value">NT$ {{ grandTotal.toLocaleString() }}</span>
+                    </div>
+                </div>
+                <button
+                    class="checkout-btn"
+                    @click="goToCheckout"
+                    :disabled="isCheckingOut"
+                >
+                    <span v-if="isCheckingOut">前往結帳...</span>
+                    <span v-else>前往結帳 - NT$ {{ grandTotal.toLocaleString() }}</span>
+                </button>
+            </div>
+        </aside>
+
         <!-- Confirm Remove Modal -->
-        <transition name="modal">
+        <transition name="fade">
             <div class="modal-overlay" v-if="removeModal.product" @click.self="closeRemoveModal">
                 <div class="modal">
                     <div class="modal-header">
@@ -1009,38 +2205,6 @@
                 </div>
             </div>
         </transition>
-
-        <!-- Checkout Modal -->
-        <transition name="modal">
-            <div class="modal-overlay" v-if="checkoutModal.open" @click.self="closeCheckoutModal">
-                <div class="modal">
-                    <div class="modal-header">
-                        <h3 class="modal-title">確認結帳</h3>
-                    </div>
-                    <div class="modal-body">
-                        <p class="modal-message">
-                            您即將購買 <strong>{{ cartItems.length }}</strong> 種商品，共 <strong>{{ totalQuantity }}</strong> 件。
-                        </p>
-                        <p class="modal-message" style="margin-top: 12px;">
-                            總金額：<strong style="color: var(--primary-color); font-size: 1.1rem;">NT$ {{ totalPrice.toLocaleString() }}</strong>
-                        </p>
-                        <div style="margin-top: 16px; padding: 12px; background: var(--bg-secondary); border-radius: var(--radius-sm); font-size: 0.85rem; color: var(--text-secondary);">
-                            <div v-for="item in cartItems" :key="item.product.id" style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-                                <span>{{ item.product.name }} × {{ item.quantity }}</span>
-                                <span>NT$ {{ (item.product.price * item.quantity).toLocaleString() }}</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button class="modal-btn modal-btn-secondary" @click="closeCheckoutModal" :disabled="isCheckingOut">取消</button>
-                        <button class="modal-btn modal-btn-primary" @click="executeCheckout" :disabled="isCheckingOut">
-                            <span v-if="isCheckingOut">處理中...</span>
-                            <span v-else>確定結帳</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </transition>
     </div>
 
     <script>
@@ -1049,14 +2213,17 @@
         createApp({
             setup() {
                 // ============ State ============
+                const currentPage = ref('products'); // 'products', 'checkout', 'success'
+
                 const products = ref([]);
                 const cart = ref([]);
                 const searchQuery = ref('');
                 const isLoading = ref(true);
+
                 const isCartOpen = ref(false);
                 const addingToCart = ref(null);
                 const justAdded = ref(null);
-                const isCheckingOut = ref(false);
+
                 const isRemoving = ref(false);
                 const toasts = ref([]);
                 let toastId = 0;
@@ -1065,19 +2232,89 @@
                     product: null
                 });
 
-                const checkoutModal = ref({
-                    open: false
+                // Checkout form state
+                const checkoutForm = ref({
+                    recipientName: '',
+                    phone: '',
+                    email: '',
+                    county: '',
+                    district: '',
+                    address: '',
+                    notes: '',
+                    paymentMethod: 'credit_card',
+                    cardNumber: '',
+                    cardExpiry: '',
+                    cardCvc: '',
+                    cardName: ''
                 });
+
+                const errors = ref({});
+                const isSubmittingOrder = ref(false);
+                const isCheckingOut = ref(false);
+
+                // Order confirmation
+                const orderConfirmation = ref(null);
 
                 // Debounce timer for search
                 let searchDebounceTimer = null;
+
+                // ============ Constants ============
+                const counties = [
+                    '臺北市', '新北市', '桃園市', '臺中市', '臺南市', '高雄市',
+                    '基隆市', '新竹市', '新竹縣', '苗栗縣', '彰化縣', '南投縣',
+                    '雲林縣', '嘉義市', '嘉義縣', '屏東縣', '宜蘭縣', '花蓮縣',
+                    '臺東縣', '澎湖縣', '金門縣', '連江縣'
+                ];
+
+                const districtsByCounty = {
+                    '臺北市': ['中正區', '大同區', '中山區', '松山區', '大安區', '萬華區', '信義區', '士林區', '北投區', '內湖區', '南港區', '文山區'],
+                    '新北市': ['板橋區', '三重區', '中和區', '永和區', '新莊區', '新店區', '樹林區', '鶯歌區', '三峽區', '淡水區', '汐止區', '瑞芳區', '土城區', '蘆洲區', '五股區', '泰山區', '林口區', '深坑區', '石碇區', '坪林區', '三芝區', '石門區', '八里區', '平溪區', '雙溪區', '貢寮區', '萬里區', '烏來區'],
+                    '桃園市': ['桃園區', '中壢區', '大溪區', '楊梅區', '蘆竹區', '大園區', '龜山區', '八德區', '龍潭區', '平鎮區', '新屋區', '觀音區', '復興區'],
+                    '臺中市': ['中區', '東區', '南區', '西區', '北區', '西屯區', '南屯區', '北屯區', '豐原區', '東勢區', '大甲區', '清水區', '沙鹿區', '梧棲區', '后里區', '神岡區', '潭子區', '大雅區', '石岡區', '外埔區', '大安區', '烏日區', '大肚區', '龍井區', '霧峰區', '太平區', '大里區', '和平區'],
+                    '臺南市': ['中西區', '東區', '南區', '北區', '安平區', '安南區', '永康區', '歸仁區', '新化區', '左鎮區', '玉井區', '楠西區', '南化區', '仁德區', '關廟區', '龍崎區', '官田區', '麻豆區', '佳里區', '西港區', '七股區', '將軍區', '北門區', '新營區', '後壁區', '白河區', '東山區', '六甲區', '下營區', '柳營區', '鹽水區', '善化區', '大內區', '山上區', '新市區', '安定區'],
+                    '高雄市': ['新興區', '前金區', '苓雅區', '鹽埕區', '鼓山區', '旗津區', '前鎮區', '三民區', '楠梓區', '小港區', '左營區', '仁武區', '大社區', '岡山區', '路竹區', '阿蓮區', '田寮區', '燕巢區', '橋頭區', '梓官區', '彌陀區', '永安區', '湖內區', '鳳山區', '大寮區', '林園區', '鳥松區', '大樹區', '旗山區', '美濃區', '六龜區', '內門區', '杉林區', '甲仙區', '桃源區', '那瑪夏區', '茂林區', '茄萣區'],
+                };
+
+                const paymentMethods = [
+                    {
+                        id: 'credit_card',
+                        name: '信用卡付款',
+                        description: '支援 Visa、Mastercard、JCB、銀聯',
+                        icon: '💳'
+                    },
+                    {
+                        id: 'atm',
+                        name: 'ATM 轉帳',
+                        description: '虛擬帳號轉帳，24 小時內完成',
+                        icon: '🏦'
+                    },
+                    {
+                        id: 'cvs',
+                        name: '超商代碼繳費',
+                        description: '全台四大超商取貨付款/條碼繳費',
+                        icon: '🏪'
+                    },
+                    {
+                        id: 'linepay',
+                        name: 'LINE Pay',
+                        description: '掃碼付款，綁定信用卡/儲值',
+                        icon: '💚'
+                    },
+                    {
+                        id: 'cod',
+                        name: '貨到付款',
+                        description: '收到貨品再付款，手續費 NT$30',
+                        icon: '📦'
+                    }
+                ];
 
                 // ============ Computed ============
                 const filteredProducts = computed(() => {
                     if (!searchQuery.value.trim()) return products.value;
                     const query = searchQuery.value.toLowerCase().trim();
                     return products.value.filter(p =>
-                        p.name.toLowerCase().includes(query)
+                        p.name.toLowerCase().includes(query) ||
+                        p.category.toLowerCase().includes(query)
                     );
                 });
 
@@ -1087,26 +2324,39 @@
                     cart.value.reduce((sum, item) => sum + item.quantity, 0)
                 );
 
-                const totalPrice = computed(() =>
+                const subtotal = computed(() =>
                     cart.value.reduce((sum, item) => sum + item.product.price * item.quantity, 0)
                 );
+
+                const shippingFee = computed(() =>
+                    subtotal.value >= 3000 ? 0 : 120
+                );
+
+                const grandTotal = computed(() =>
+                    subtotal.value + shippingFee.value
+                );
+
+                const totalPrice = computed(() => grandTotal.value);
+
+                const districts = computed(() => {
+                    return districtsByCounty[checkoutForm.value.county] || [];
+                });
 
                 // ============ Methods ============
                 async function loadProducts() {
                     isLoading.value = true;
                     try {
-                        // Simulate API call
                         await new Promise(resolve => setTimeout(resolve, 800));
                         products.value = [
-                            { id: 1, name: '無線藍牙耳機', price: 2999, image: 'https://picsum.photos/seed/earphones/400/400.jpg' },
-                            { id: 2, name: '智慧手錶', price: 8999, image: 'https://picsum.photos/seed/smartwatch/400/400.jpg' },
-                            { id: 3, name: '便攜式充電器', price: 1299, image: 'https://picsum.photos/seed/powerbank/400/400.jpg' },
-                            { id: 4, name: '無線滑鼠', price: 899, image: 'https://picsum.photos/seed/mouse/400/400.jpg' },
-                            { id: 5, name: '機械鍵盤', price: 3999, image: 'https://picsum.photos/seed/keyboard/400/400.jpg' },
-                            { id: 6, name: '網路攝影機', price: 2199, image: 'https://picsum.photos/seed/webcam/400/400.jpg' },
-                            { id: 7, name: 'USB隨身碟', price: 599, image: 'https://picsum.photos/seed/usb/400/400.jpg' },
-                            { id: 8, name: '桌面擴音器', price: 1599, image: 'https://picsum.photos/seed/speaker/400/400.jpg' }
-                        ].map(p => ({ ...p, imageLoaded: false }));
+                            { id: 1, name: '無線藍牙降噪耳機', price: 2999, originalPrice: 3599, image: 'https://picsum.photos/seed/earphones/400/400.jpg', category: '3C電子', badge: '熱銷', imageLoaded: false },
+                            { id: 2, name: '智慧健康手錶', price: 8999, originalPrice: 9999, image: 'https://picsum.photos/seed/smartwatch/400/400.jpg', category: '3C電子', badge: '新品', imageLoaded: false },
+                            { id: 3, name: '大容量便攜充電器 20000mAh', price: 1299, image: 'https://picsum.photos/seed/powerbank/400/400.jpg', category: '3C電子', badge: null, imageLoaded: false },
+                            { id: 4, name: '人體工學無線滑鼠', price: 899, originalPrice: 1199, image: 'https://picsum.photos/seed/mouse/400/400.jpg', category: '3C電子', badge: '推薦', imageLoaded: false },
+                            { id: 5, name: 'RGB 機械鍵盤 紅軸', price: 3999, image: 'https://picsum.photos/seed/keyboard/400/400.jpg', category: '3C電子', badge: null, imageLoaded: false },
+                            { id: 6, name: '4K 高畫質網路攝影機', price: 2199, image: 'https://picsum.photos/seed/webcam/400/400.jpg', category: '3C電子', badge: null, imageLoaded: false },
+                            { id: 7, name: '高速 USB 3.2 隨身碟 1TB', price: 599, image: 'https://picsum.photos/seed/usb/400/400.jpg', category: '3C電子', badge: null, imageLoaded: false },
+                            { id: 8, name: '桌面級藍牙擴音器', price: 1599, originalPrice: 1999, image: 'https://picsum.photos/seed/speaker/400/400.jpg', category: '3C電子', badge: '優惠', imageLoaded: false }
+                        ];
                     } catch (error) {
                         showToast('載入商品失敗，請重試', 'error');
                         console.error('Failed to load products:', error);
@@ -1122,7 +2372,7 @@
                 function debouncedSearch() {
                     clearTimeout(searchDebounceTimer);
                     searchDebounceTimer = setTimeout(() => {
-                        // Search is reactive via computed, no extra work needed
+                        // Reactive via computed
                     }, 300);
                 }
 
@@ -1136,7 +2386,6 @@
                     addingToCart.value = product.id;
 
                     try {
-                        // Simulate API call
                         await new Promise(resolve => setTimeout(resolve, 300));
 
                         const existingIndex = cart.value.findIndex(item => item.product.id === product.id);
@@ -1154,7 +2403,6 @@
                             justAdded.value = null;
                         }, 1500);
 
-                        // Auto-open cart on first item
                         if (cart.value.length === 1) {
                             openCart();
                         }
@@ -1197,7 +2445,6 @@
                     const productId = removeModal.value.product.id;
 
                     try {
-                        // Simulate API call
                         await new Promise(resolve => setTimeout(resolve, 300));
 
                         const index = cart.value.findIndex(item => item.product.id === productId);
@@ -1215,41 +2462,6 @@
                     }
                 }
 
-                function confirmCheckout() {
-                    if (cart.value.length === 0) return;
-                    checkoutModal.value.open = true;
-                    document.body.style.overflow = 'hidden';
-                }
-
-                function closeCheckoutModal() {
-                    checkoutModal.value.open = false;
-                    document.body.style.overflow = '';
-                }
-
-                async function executeCheckout() {
-                    if (isCheckingOut.value || cart.value.length === 0) return;
-
-                    isCheckingOut.value = true;
-                    closeCheckoutModal();
-
-                    try {
-                        // Simulate checkout API
-                        await new Promise(resolve => setTimeout(resolve, 1500));
-
-                        const itemCount = cart.value.length;
-                        const total = totalPrice.value;
-
-                        cart.value = [];
-                        showToast(`結帳成功！共 ${itemCount} 種商品，NT$ ${total.toLocaleString()}`, 'success');
-                        closeCart();
-                    } catch (error) {
-                        showToast('結帳失敗，請重試', 'error');
-                        console.error('Checkout failed:', error);
-                    } finally {
-                        isCheckingOut.value = false;
-                    }
-                }
-
                 function openCart() {
                     isCartOpen.value = true;
                     document.body.style.overflow = 'hidden';
@@ -1260,11 +2472,167 @@
                     document.body.style.overflow = '';
                 }
 
+                // Navigation
+                function goToCheckout() {
+                    if (cart.value.length === 0) return;
+                    closeCart();
+                    currentPage.value = 'checkout';
+                    // Reset form
+                    checkoutForm.value = {
+                        recipientName: '',
+                        phone: '',
+                        email: '',
+                        county: '',
+                        district: '',
+                        address: '',
+                        notes: '',
+                        paymentMethod: 'credit_card',
+                        cardNumber: '',
+                        cardExpiry: '',
+                        cardCvc: '',
+                        cardName: ''
+                    };
+                    errors.value = {};
+                    window.scrollTo(0, 0);
+                }
+
+                function goBackToCart() {
+                    currentPage.value = 'products';
+                    openCart();
+                    window.scrollTo(0, 0);
+                }
+
+                function goHome() {
+                    currentPage.value = 'products';
+                    searchQuery.value = '';
+                    window.scrollTo(0, 0);
+                }
+
+                // Form validation
+                function validateForm() {
+                    const newErrors = {};
+                    const f = checkoutForm.value;
+
+                    if (!f.recipientName.trim()) newErrors.recipientName = true;
+                    if (!f.phone.trim() || !/^09\d{8}$/.test(f.phone.replace(/-/g, ''))) newErrors.phone = true;
+                    if (!f.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email)) newErrors.email = true;
+                    if (!f.county) newErrors.county = true;
+                    if (!f.district) newErrors.district = true;
+                    if (!f.address.trim()) newErrors.address = true;
+
+                    if (f.paymentMethod === 'credit_card') {
+                        const cardNum = f.cardNumber.replace(/\s/g, '');
+                        if (!cardNum || cardNum.length < 13 || cardNum.length > 19 || !/^\d+$/.test(cardNum)) {
+                            newErrors.cardNumber = true;
+                        }
+                        if (!f.cardExpiry || !/^(0[1-9]|1[0-2])\/\d{2}$/.test(f.cardExpiry)) {
+                            newErrors.cardExpiry = true;
+                        }
+                        if (!f.cardCvc || !/^\d{3,4}$/.test(f.cardCvc)) {
+                            newErrors.cardCvc = true;
+                        }
+                        if (!f.cardName.trim()) {
+                            newErrors.cardName = true;
+                        }
+                    }
+
+                    errors.value = newErrors;
+                    return Object.keys(newErrors).length === 0;
+                }
+
+                function validateAndProceed() {
+                    if (validateForm()) {
+                        submitOrder();
+                    } else {
+                        showToast('請填寫所有必填欄位', 'error');
+                        // Scroll to first error
+                        nextTick(() => {
+                            const firstError = document.querySelector('.form-input.error, .form-select.error');
+                            if (firstError) {
+                                firstError.focus();
+                                firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            }
+                        });
+                    }
+                }
+
+                function formatCardNumber(e) {
+                    let value = e.target.value.replace(/\D/g, '');
+                    value = value.replace(/(\d{4})/g, '$1 ').trim();
+                    if (value.length > 19) value = value.slice(0, 19);
+                    checkoutForm.value.cardNumber = value;
+                }
+
+                function formatCardExpiry(e) {
+                    let value = e.target.value.replace(/\D/g, '');
+                    if (value.length >= 2) {
+                        value = value.slice(0, 2) + '/' + value.slice(2, 4);
+                    }
+                    checkoutForm.value.cardExpiry = value;
+                }
+
+                async function submitOrder() {
+                    if (isSubmittingOrder.value || cart.value.length === 0) return;
+
+                    isSubmittingOrder.value = true;
+
+                    try {
+                        // Simulate payment processing
+                        await new Promise(resolve => setTimeout(resolve, 2000));
+
+                        // Generate order number
+                        const orderNumber = 'ORD-' + Date.now().toString(36).toUpperCase() + Math.random().toString(36).substring(2, 6).toUpperCase();
+
+                        const now = new Date();
+                        const orderDate = now.toLocaleString('zh-TW', {
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            second: '2-digit',
+                            hour12: false
+                        }).replace(/\//g, '-');
+
+                        const paymentMethodObj = paymentMethods.find(m => m.id === checkoutForm.value.paymentMethod);
+
+                        const shippingAddr = `${checkoutForm.value.county}${checkoutForm.value.district}${checkoutForm.value.address}`;
+
+                        orderConfirmation.value = {
+                            orderNumber,
+                            orderDate,
+                            paymentMethod: paymentMethodObj?.name || checkoutForm.value.paymentMethod,
+                            shippingAddress: shippingAddr,
+                            total: grandTotal.value
+                        };
+
+                        // Clear cart
+                        cart.value = [];
+
+                        // Navigate to success page
+                        currentPage.value = 'success';
+                        showToast('訂單成立！感謝您的購買', 'success');
+                        window.scrollTo(0, 0);
+                    } catch (error) {
+                        showToast('訂單處理失敗，請重試', 'error');
+                        console.error('Order submission failed:', error);
+                    } finally {
+                        isSubmittingOrder.value = false;
+                    }
+                }
+
+                function downloadInvoice() {
+                    showToast('發票已寄送至您的電子郵件', 'success');
+                }
+
+                function viewOrderHistory() {
+                    showToast('訂單紀錄功能開發中', 'success');
+                }
+
                 function showToast(message, type = 'success') {
                     const id = ++toastId;
                     toasts.value.push({ id, message, type });
 
-                    // Auto remove after 4 seconds
                     setTimeout(() => {
                         removeToast(id);
                     }, 4000);
@@ -1285,21 +2653,19 @@
                 onMounted(() => {
                     loadProducts();
 
-                    // Close cart on Escape key
                     const handleKeydown = (e) => {
                         if (e.key === 'Escape') {
-                            if (checkoutModal.value.open) {
-                                closeCheckoutModal();
-                            } else if (removeModal.value.product) {
+                            if (removeModal.value.product) {
                                 closeRemoveModal();
                             } else if (isCartOpen.value) {
                                 closeCart();
+                            } else if (currentPage.value === 'checkout') {
+                                goBackToCart();
                             }
                         }
                     };
                     document.addEventListener('keydown', handleKeydown);
 
-                    // Cleanup
                     return () => {
                         document.removeEventListener('keydown', handleKeydown);
                         clearTimeout(searchDebounceTimer);
@@ -1311,7 +2677,7 @@
                     document.body.style.overflow = '';
                 });
 
-                // Watch for cart changes to persist (optional)
+                // Persist cart
                 watch(cart, (newCart) => {
                     try {
                         localStorage.setItem('shopping_cart', JSON.stringify(newCart));
@@ -1320,7 +2686,7 @@
                     }
                 }, { deep: true });
 
-                // Restore cart from localStorage
+                // Restore cart
                 const savedCart = localStorage.getItem('shopping_cart');
                 if (savedCart) {
                     try {
@@ -1331,21 +2697,31 @@
                 }
 
                 return {
+                    currentPage,
                     products,
                     searchQuery,
                     isLoading,
                     isCartOpen,
                     addingToCart,
                     justAdded,
-                    isCheckingOut,
                     isRemoving,
                     toasts,
                     removeModal,
-                    checkoutModal,
+                    checkoutForm,
+                    errors,
+                    isSubmittingOrder,
+                    isCheckingOut,
+                    orderConfirmation,
                     filteredProducts,
                     cartItems,
                     totalQuantity,
+                    subtotal,
+                    shippingFee,
+                    grandTotal,
                     totalPrice,
+                    counties,
+                    districts,
+                    paymentMethods,
                     loadProducts,
                     handleImageLoad,
                     debouncedSearch,
@@ -1355,11 +2731,18 @@
                     confirmRemoveItem,
                     closeRemoveModal,
                     executeRemoveItem,
-                    confirmCheckout,
-                    closeCheckoutModal,
-                    executeCheckout,
                     openCart,
                     closeCart,
+                    goToCheckout,
+                    goBackToCart,
+                    goHome,
+                    validateForm,
+                    validateAndProceed,
+                    submitOrder,
+                    formatCardNumber,
+                    formatCardExpiry,
+                    downloadInvoice,
+                    viewOrderHistory,
                     showToast,
                     removeToast
                 };
