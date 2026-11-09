@@ -1,0 +1,1370 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>商品展示頁面</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #ff6b6b;
+            --secondary-color: #4CAF50;
+            --text-primary: #333;
+            --text-secondary: #666;
+            --text-muted: #999;
+            --border-color: #ddd;
+            --border-light: #eee;
+            --bg-primary: #fff;
+            --bg-secondary: #f5f5f5;
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+            --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --transition: all 0.2s ease;
+            --z-dropdown: 100;
+            --z-modal: 1000;
+            --z-toast: 1100;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .app {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .header {
+            background-color: var(--text-primary);
+            color: var(--bg-primary);
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .cart-trigger {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background-color: var(--primary-color);
+            border: none;
+            border-radius: var(--radius-md);
+            color: var(--bg-primary);
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .cart-trigger:hover {
+            background-color: #e55a5a;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            min-width: 20px;
+            height: 20px;
+            background-color: var(--bg-primary);
+            color: var(--primary-color);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 0 6px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 24px;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* Search Bar */
+        .search-section {
+            margin-bottom: 24px;
+        }
+
+        .search-wrapper {
+            position: relative;
+            max-width: 480px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 14px 20px 14px 48px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            font-size: 1rem;
+            background-color: var(--bg-primary);
+            transition: var(--transition);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.15);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        .search-clear {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius-sm);
+            transition: var(--transition);
+        }
+
+        .search-clear:hover {
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .results-count {
+            margin-top: 8px;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        /* Loading State */
+        .loading-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 24px;
+            gap: 16px;
+            color: var(--text-muted);
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border-color);
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Products Grid */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 20px;
+        }
+
+        @media (max-width: 640px) {
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Product Card */
+        .product-card {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary-color);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 200px;
+            background-color: var(--bg-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .product-image::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, var(--border-light) 25%, transparent 25%) -50px 0,
+                        linear-gradient(225deg, var(--border-light) 25%, transparent 25%) -50px 0,
+                        linear-gradient(315deg, var(--border-light) 25%, transparent 25%) 0 0,
+                        linear-gradient(45deg, var(--border-light) 25%, transparent 25%) 0 0;
+            background-size: 100px 100px;
+            animation: shimmer 2s infinite linear;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100px); }
+            100% { transform: translateX(100px); }
+        }
+
+        .product-info {
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .product-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .product-price {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 16px;
+        }
+
+        .add-to-cart-btn {
+            width: 100%;
+            padding: 12px 16px;
+            background-color: var(--secondary-color);
+            color: var(--bg-primary);
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .add-to-cart-btn:hover {
+            background-color: #3d8b40;
+            transform: translateY(-1px);
+        }
+
+        .add-to-cart-btn:active {
+            transform: translateY(0);
+        }
+
+        .add-to-cart-btn.added {
+            background-color: var(--primary-color);
+        }
+
+        .add-to-cart-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* Empty State */
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 60px 24px;
+            color: var(--text-muted);
+        }
+
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        /* Cart Sidebar */
+        .cart-overlay {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: calc(var(--z-modal) - 1);
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+
+        .cart-overlay.open {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .cart-sidebar {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 100%;
+            max-width: 420px;
+            height: 100vh;
+            background-color: var(--bg-primary);
+            box-shadow: var(--shadow-lg);
+            z-index: var(--z-modal);
+            transform: translateX(100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .cart-sidebar.open {
+            transform: translateX(0);
+        }
+
+        .cart-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .cart-header h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .close-cart {
+            width: 40px;
+            height: 40px;
+            border: none;
+            background: none;
+            font-size: 1.5rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .close-cart:hover {
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .cart-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 24px;
+        }
+
+        .cart-empty {
+            text-align: center;
+            padding: 40px 0;
+            color: var(--text-muted);
+        }
+
+        .cart-empty-icon {
+            font-size: 3rem;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .cart-items {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .cart-item {
+            display: flex;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .cart-item-image {
+            width: 70px;
+            height: 70px;
+            background-color: var(--bg-secondary);
+            border-radius: var(--radius-md);
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+        }
+
+        .cart-item-details {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .cart-item-title {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .cart-item-price {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .quantity-btn {
+            width: 32px;
+            height: 32px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-primary);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            transition: var(--transition);
+        }
+
+        .quantity-btn:hover:not(:disabled) {
+            background-color: var(--bg-secondary);
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .quantity-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .quantity-display {
+            min-width: 36px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .cart-item-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .remove-item-btn {
+            padding: 6px 12px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-primary);
+            color: var(--text-secondary);
+            border-radius: var(--radius-sm);
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .remove-item-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            background-color: #fff5f5;
+        }
+
+        .cart-footer {
+            padding: 20px 24px;
+            border-top: 1px solid var(--border-color);
+            background-color: var(--bg-secondary);
+        }
+
+        .cart-total {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            font-size: 1.1rem;
+        }
+
+        .total-label {
+            font-weight: 500;
+        }
+
+        .total-amount {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .checkout-btn {
+            width: 100%;
+            padding: 16px;
+            background-color: var(--primary-color);
+            color: var(--bg-primary);
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 1.05rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .checkout-btn:hover:not(:disabled) {
+            background-color: #e55a5a;
+            transform: translateY(-1px);
+        }
+
+        .checkout-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: var(--z-toast);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: none;
+        }
+
+        .toast {
+            pointer-events: auto;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 20px;
+            background-color: var(--bg-primary);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-lg);
+            border-left: 4px solid var(--secondary-color);
+            animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            max-width: 360px;
+        }
+
+        .toast.removing {
+            animation: slideOut 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        .toast.error {
+            border-left-color: var(--primary-color);
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                opacity: 1;
+                transform: translateX(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+        }
+
+        .toast-icon {
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+
+        .toast.success .toast-icon {
+            color: var(--secondary-color);
+        }
+
+        .toast.error .toast-icon {
+            color: var(--primary-color);
+        }
+
+        .toast-message {
+            flex: 1;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .toast-close {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 4px;
+            border-radius: var(--radius-sm);
+            transition: var(--transition);
+        }
+
+        .toast-close:hover {
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        /* Modal Dialog */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: var(--z-modal);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+
+        .modal-overlay.open {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background-color: var(--bg-primary);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            max-width: 420px;
+            width: 100%;
+            transform: scale(0.9) translateY(20px);
+            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .modal-overlay.open .modal {
+            transform: scale(1) translateY(0);
+        }
+
+        .modal-header {
+            padding: 24px 24px 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .modal-title {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .modal-message {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .modal-footer {
+            padding: 16px 24px 24px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        .modal-btn {
+            padding: 10px 20px;
+            border-radius: var(--radius-md);
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+        }
+
+        .modal-btn-secondary {
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .modal-btn-secondary:hover {
+            background-color: var(--border-color);
+        }
+
+        .modal-btn-primary {
+            background-color: var(--primary-color);
+            color: var(--bg-primary);
+        }
+
+        .modal-btn-primary:hover:not(:disabled) {
+            background-color: #e55a5a;
+        }
+
+        .modal-btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .modal-btn-danger {
+            background-color: var(--primary-color);
+            color: var(--bg-primary);
+        }
+
+        .modal-btn-danger:hover:not(:disabled) {
+            background-color: #e55a5a;
+        }
+
+        /* Focus visible for accessibility */
+        *:focus-visible {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 2px;
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <header class="header">
+            <h1>精品商店</h1>
+            <button class="cart-trigger" @click="openCart" aria-label="打開購物車">
+                🛒 購物車
+                <span class="cart-count" v-if="totalQuantity > 0">{{ totalQuantity }}</span>
+            </button>
+        </header>
+
+        <main class="main-content">
+            <!-- Search Section -->
+            <section class="search-section">
+                <div class="search-wrapper">
+                    <span class="search-icon" aria-hidden="true">🔍</span>
+                    <input
+                        type="search"
+                        class="search-input"
+                        placeholder="搜尋商品..."
+                        v-model="searchQuery"
+                        @input="debouncedSearch"
+                        aria-label="搜尋商品"
+                        autocomplete="off"
+                    >
+                    <button
+                        class="search-clear"
+                        v-if="searchQuery"
+                        @click="clearSearch"
+                        aria-label="清除搜尋"
+                    >
+                        ✕
+                    </button>
+                </div>
+                <p class="results-count" v-if="searchQuery">
+                    找到 <strong>{{ filteredProducts.length }}</strong> 個商品 (共 {{ products.length }} 個)
+                </p>
+            </section>
+
+            <!-- Loading State -->
+            <div class="loading-state" v-if="isLoading">
+                <div class="spinner" aria-hidden="true"></div>
+                <p>載入商品中...</p>
+            </div>
+
+            <!-- Products Grid -->
+            <section aria-label="商品列表">
+                <div class="products-grid" v-if="!isLoading">
+                    <div
+                        class="product-card"
+                        v-for="product in filteredProducts"
+                        :key="product.id"
+                    >
+                        <div class="product-image" aria-hidden="true">
+                            <span v-if="!product.imageLoaded">圖片載入中...</span>
+                            <img
+                                v-else
+                                :src="product.image"
+                                :alt="product.name"
+                                loading="lazy"
+                            >
+                        </div>
+                        <div class="product-info">
+                            <h3 class="product-title">{{ product.name }}</h3>
+                            <div class="product-price">NT$ {{ product.price.toLocaleString() }}</div>
+                            <button
+                                class="add-to-cart-btn"
+                                :class="{ added: justAdded === product.id }"
+                                @click="addToCart(product)"
+                                :disabled="addingToCart === product.id"
+                                aria-label="將 {{ product.name }} 加入購物車"
+                            >
+                                <span v-if="addingToCart === product.id">加入中...</span>
+                                <span v-else-if="justAdded === product.id">✓ 已加入</span>
+                                <span v-else>加入購物車</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="empty-state" v-if="!isLoading && filteredProducts.length === 0">
+                        <div class="empty-state-icon">🔍</div>
+                        <p v-if="searchQuery">找不到符合「{{ searchQuery }}」的商品</p>
+                        <p v-else>目前沒有商品</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Cart Overlay -->
+        <div class="cart-overlay" :class="{ open: isCartOpen }" @click="closeCart" aria-hidden="true"></div>
+
+        <!-- Cart Sidebar -->
+        <aside
+            class="cart-sidebar"
+            :class="{ open: isCartOpen }"
+            role="dialog"
+            aria-label="購物車"
+            aria-modal="true"
+        >
+            <div class="cart-header">
+                <h2>購物車 ({{ cartItems.length }})</h2>
+                <button class="close-cart" @click="closeCart" aria-label="關閉購物車">×</button>
+            </div>
+
+            <div class="cart-content">
+                <div class="cart-empty" v-if="cartItems.length === 0">
+                    <div class="cart-empty-icon">🛒</div>
+                    <p>購物車是空的</p>
+                    <p style="font-size: 0.875rem; margin-top: 8px;">挑選喜歡的商品加入購物車吧！</p>
+                </div>
+
+                <div class="cart-items" v-else>
+                    <div class="cart-item" v-for="item in cartItems" :key="item.product.id">
+                        <div class="cart-item-image" aria-hidden="true">圖片</div>
+                        <div class="cart-item-details">
+                            <div class="cart-item-title">{{ item.product.name }}</div>
+                            <div class="cart-item-price">
+                                NT$ {{ item.product.price.toLocaleString() }} × {{ item.quantity }}
+                            </div>
+                            <div class="quantity-controls">
+                                <button
+                                    class="quantity-btn"
+                                    @click="updateQuantity(item.product.id, -1)"
+                                    :disabled="item.quantity <= 1"
+                                    aria-label="減少 {{ item.product.name }} 數量"
+                                >
+                                    −
+                                </button>
+                                <span class="quantity-display">{{ item.quantity }}</span>
+                                <button
+                                    class="quantity-btn"
+                                    @click="updateQuantity(item.product.id, 1)"
+                                    aria-label="增加 {{ item.product.name }} 數量"
+                                >
+                                    +
+                                </button>
+                            </div>
+                        </div>
+                        <div class="cart-item-actions">
+                            <button
+                                class="remove-item-btn"
+                                @click="confirmRemoveItem(item.product)"
+                                aria-label="移除 {{ item.product.name }}"
+                            >
+                                移除
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cart-footer" v-if="cartItems.length > 0">
+                <div class="cart-total">
+                    <span class="total-label">總計 ({{ totalQuantity }} 件)</span>
+                    <span class="total-amount">NT$ {{ totalPrice.toLocaleString() }}</span>
+                </div>
+                <button
+                    class="checkout-btn"
+                    @click="confirmCheckout"
+                    :disabled="isCheckingOut"
+                >
+                    <span v-if="isCheckingOut">結帳中...</span>
+                    <span v-else>結帳 - NT$ {{ totalPrice.toLocaleString() }}</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Toast Container -->
+        <div class="toast-container" aria-live="polite" aria-atomic="true">
+            <transition-group name="toast">
+                <div
+                    v-for="toast in toasts"
+                    :key="toast.id"
+                    :class="['toast', toast.type]"
+                    :class="{ removing: toast.removing }"
+                    role="alert"
+                >
+                    <span class="toast-icon" aria-hidden="true">
+                        <span v-if="toast.type === 'success'">✓</span>
+                        <span v-else>✕</span>
+                    </span>
+                    <span class="toast-message">{{ toast.message }}</span>
+                    <button class="toast-close" @click="removeToast(toast.id)" aria-label="關閉通知">✕</button>
+                </div>
+            </transition-group>
+        </div>
+
+        <!-- Confirm Remove Modal -->
+        <transition name="modal">
+            <div class="modal-overlay" v-if="removeModal.product" @click.self="closeRemoveModal">
+                <div class="modal">
+                    <div class="modal-header">
+                        <h3 class="modal-title">移除商品</h3>
+                    </div>
+                    <div class="modal-body">
+                        <p class="modal-message">
+                            確定要從購物車移除 <strong>{{ removeModal.product.name }}</strong> 嗎？
+                        </p>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="modal-btn modal-btn-secondary" @click="closeRemoveModal">取消</button>
+                        <button class="modal-btn modal-btn-danger" @click="executeRemoveItem" :disabled="isRemoving">
+                            <span v-if="isRemoving">移除中...</span>
+                            <span v-else>確定移除</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </transition>
+
+        <!-- Checkout Modal -->
+        <transition name="modal">
+            <div class="modal-overlay" v-if="checkoutModal.open" @click.self="closeCheckoutModal">
+                <div class="modal">
+                    <div class="modal-header">
+                        <h3 class="modal-title">確認結帳</h3>
+                    </div>
+                    <div class="modal-body">
+                        <p class="modal-message">
+                            您即將購買 <strong>{{ cartItems.length }}</strong> 種商品，共 <strong>{{ totalQuantity }}</strong> 件。
+                        </p>
+                        <p class="modal-message" style="margin-top: 12px;">
+                            總金額：<strong style="color: var(--primary-color); font-size: 1.1rem;">NT$ {{ totalPrice.toLocaleString() }}</strong>
+                        </p>
+                        <div style="margin-top: 16px; padding: 12px; background: var(--bg-secondary); border-radius: var(--radius-sm); font-size: 0.85rem; color: var(--text-secondary);">
+                            <div v-for="item in cartItems" :key="item.product.id" style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                                <span>{{ item.product.name }} × {{ item.quantity }}</span>
+                                <span>NT$ {{ (item.product.price * item.quantity).toLocaleString() }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="modal-btn modal-btn-secondary" @click="closeCheckoutModal" :disabled="isCheckingOut">取消</button>
+                        <button class="modal-btn modal-btn-primary" @click="executeCheckout" :disabled="isCheckingOut">
+                            <span v-if="isCheckingOut">處理中...</span>
+                            <span v-else>確定結帳</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </transition>
+    </div>
+
+    <script>
+        const { createApp, ref, computed, watch, onMounted, onUnmounted, nextTick } = Vue;
+
+        createApp({
+            setup() {
+                // ============ State ============
+                const products = ref([]);
+                const cart = ref([]);
+                const searchQuery = ref('');
+                const isLoading = ref(true);
+                const isCartOpen = ref(false);
+                const addingToCart = ref(null);
+                const justAdded = ref(null);
+                const isCheckingOut = ref(false);
+                const isRemoving = ref(false);
+                const toasts = ref([]);
+                let toastId = 0;
+
+                const removeModal = ref({
+                    product: null
+                });
+
+                const checkoutModal = ref({
+                    open: false
+                });
+
+                // Debounce timer for search
+                let searchDebounceTimer = null;
+
+                // ============ Computed ============
+                const filteredProducts = computed(() => {
+                    if (!searchQuery.value.trim()) return products.value;
+                    const query = searchQuery.value.toLowerCase().trim();
+                    return products.value.filter(p =>
+                        p.name.toLowerCase().includes(query)
+                    );
+                });
+
+                const cartItems = computed(() => cart.value);
+
+                const totalQuantity = computed(() =>
+                    cart.value.reduce((sum, item) => sum + item.quantity, 0)
+                );
+
+                const totalPrice = computed(() =>
+                    cart.value.reduce((sum, item) => sum + item.product.price * item.quantity, 0)
+                );
+
+                // ============ Methods ============
+                async function loadProducts() {
+                    isLoading.value = true;
+                    try {
+                        // Simulate API call
+                        await new Promise(resolve => setTimeout(resolve, 800));
+                        products.value = [
+                            { id: 1, name: '無線藍牙耳機', price: 2999, image: 'https://picsum.photos/seed/earphones/400/400.jpg' },
+                            { id: 2, name: '智慧手錶', price: 8999, image: 'https://picsum.photos/seed/smartwatch/400/400.jpg' },
+                            { id: 3, name: '便攜式充電器', price: 1299, image: 'https://picsum.photos/seed/powerbank/400/400.jpg' },
+                            { id: 4, name: '無線滑鼠', price: 899, image: 'https://picsum.photos/seed/mouse/400/400.jpg' },
+                            { id: 5, name: '機械鍵盤', price: 3999, image: 'https://picsum.photos/seed/keyboard/400/400.jpg' },
+                            { id: 6, name: '網路攝影機', price: 2199, image: 'https://picsum.photos/seed/webcam/400/400.jpg' },
+                            { id: 7, name: 'USB隨身碟', price: 599, image: 'https://picsum.photos/seed/usb/400/400.jpg' },
+                            { id: 8, name: '桌面擴音器', price: 1599, image: 'https://picsum.photos/seed/speaker/400/400.jpg' }
+                        ].map(p => ({ ...p, imageLoaded: false }));
+                    } catch (error) {
+                        showToast('載入商品失敗，請重試', 'error');
+                        console.error('Failed to load products:', error);
+                    } finally {
+                        isLoading.value = false;
+                    }
+                }
+
+                function handleImageLoad(product) {
+                    product.imageLoaded = true;
+                }
+
+                function debouncedSearch() {
+                    clearTimeout(searchDebounceTimer);
+                    searchDebounceTimer = setTimeout(() => {
+                        // Search is reactive via computed, no extra work needed
+                    }, 300);
+                }
+
+                function clearSearch() {
+                    searchQuery.value = '';
+                }
+
+                async function addToCart(product) {
+                    if (addingToCart.value === product.id) return;
+
+                    addingToCart.value = product.id;
+
+                    try {
+                        // Simulate API call
+                        await new Promise(resolve => setTimeout(resolve, 300));
+
+                        const existingIndex = cart.value.findIndex(item => item.product.id === product.id);
+
+                        if (existingIndex >= 0) {
+                            cart.value[existingIndex].quantity += 1;
+                            showToast(`已增加 ${product.name} 數量`, 'success');
+                        } else {
+                            cart.value.push({ product, quantity: 1 });
+                            showToast(`已加入 ${product.name} 到購物車`, 'success');
+                        }
+
+                        justAdded.value = product.id;
+                        setTimeout(() => {
+                            justAdded.value = null;
+                        }, 1500);
+
+                        // Auto-open cart on first item
+                        if (cart.value.length === 1) {
+                            openCart();
+                        }
+                    } catch (error) {
+                        showToast('加入購物車失敗', 'error');
+                        console.error('Add to cart failed:', error);
+                    } finally {
+                        addingToCart.value = null;
+                    }
+                }
+
+                function updateQuantity(productId, change) {
+                    const index = cart.value.findIndex(item => item.product.id === productId);
+                    if (index === -1) return;
+
+                    const newQuantity = cart.value[index].quantity + change;
+
+                    if (newQuantity <= 0) {
+                        confirmRemoveItem(cart.value[index].product);
+                        return;
+                    }
+
+                    cart.value[index].quantity = newQuantity;
+                }
+
+                function confirmRemoveItem(product) {
+                    removeModal.value.product = product;
+                    document.body.style.overflow = 'hidden';
+                }
+
+                function closeRemoveModal() {
+                    removeModal.value.product = null;
+                    document.body.style.overflow = '';
+                }
+
+                async function executeRemoveItem() {
+                    if (!removeModal.value.product || isRemoving.value) return;
+
+                    isRemoving.value = true;
+                    const productId = removeModal.value.product.id;
+
+                    try {
+                        // Simulate API call
+                        await new Promise(resolve => setTimeout(resolve, 300));
+
+                        const index = cart.value.findIndex(item => item.product.id === productId);
+                        if (index >= 0) {
+                            const name = cart.value[index].product.name;
+                            cart.value.splice(index, 1);
+                            showToast(`已移除 ${name}`, 'success');
+                        }
+                        closeRemoveModal();
+                    } catch (error) {
+                        showToast('移除失敗', 'error');
+                        console.error('Remove failed:', error);
+                    } finally {
+                        isRemoving.value = false;
+                    }
+                }
+
+                function confirmCheckout() {
+                    if (cart.value.length === 0) return;
+                    checkoutModal.value.open = true;
+                    document.body.style.overflow = 'hidden';
+                }
+
+                function closeCheckoutModal() {
+                    checkoutModal.value.open = false;
+                    document.body.style.overflow = '';
+                }
+
+                async function executeCheckout() {
+                    if (isCheckingOut.value || cart.value.length === 0) return;
+
+                    isCheckingOut.value = true;
+                    closeCheckoutModal();
+
+                    try {
+                        // Simulate checkout API
+                        await new Promise(resolve => setTimeout(resolve, 1500));
+
+                        const itemCount = cart.value.length;
+                        const total = totalPrice.value;
+
+                        cart.value = [];
+                        showToast(`結帳成功！共 ${itemCount} 種商品，NT$ ${total.toLocaleString()}`, 'success');
+                        closeCart();
+                    } catch (error) {
+                        showToast('結帳失敗，請重試', 'error');
+                        console.error('Checkout failed:', error);
+                    } finally {
+                        isCheckingOut.value = false;
+                    }
+                }
+
+                function openCart() {
+                    isCartOpen.value = true;
+                    document.body.style.overflow = 'hidden';
+                }
+
+                function closeCart() {
+                    isCartOpen.value = false;
+                    document.body.style.overflow = '';
+                }
+
+                function showToast(message, type = 'success') {
+                    const id = ++toastId;
+                    toasts.value.push({ id, message, type });
+
+                    // Auto remove after 4 seconds
+                    setTimeout(() => {
+                        removeToast(id);
+                    }, 4000);
+                }
+
+                function removeToast(id) {
+                    const toast = toasts.value.find(t => t.id === id);
+                    if (toast) {
+                        toast.removing = true;
+                        setTimeout(() => {
+                            const index = toasts.value.findIndex(t => t.id === id);
+                            if (index >= 0) toasts.value.splice(index, 1);
+                        }, 300);
+                    }
+                }
+
+                // ============ Lifecycle ============
+                onMounted(() => {
+                    loadProducts();
+
+                    // Close cart on Escape key
+                    const handleKeydown = (e) => {
+                        if (e.key === 'Escape') {
+                            if (checkoutModal.value.open) {
+                                closeCheckoutModal();
+                            } else if (removeModal.value.product) {
+                                closeRemoveModal();
+                            } else if (isCartOpen.value) {
+                                closeCart();
+                            }
+                        }
+                    };
+                    document.addEventListener('keydown', handleKeydown);
+
+                    // Cleanup
+                    return () => {
+                        document.removeEventListener('keydown', handleKeydown);
+                        clearTimeout(searchDebounceTimer);
+                    };
+                });
+
+                onUnmounted(() => {
+                    clearTimeout(searchDebounceTimer);
+                    document.body.style.overflow = '';
+                });
+
+                // Watch for cart changes to persist (optional)
+                watch(cart, (newCart) => {
+                    try {
+                        localStorage.setItem('shopping_cart', JSON.stringify(newCart));
+                    } catch (e) {
+                        console.warn('Failed to persist cart:', e);
+                    }
+                }, { deep: true });
+
+                // Restore cart from localStorage
+                const savedCart = localStorage.getItem('shopping_cart');
+                if (savedCart) {
+                    try {
+                        cart.value = JSON.parse(savedCart);
+                    } catch (e) {
+                        console.warn('Failed to restore cart:', e);
+                    }
+                }
+
+                return {
+                    products,
+                    searchQuery,
+                    isLoading,
+                    isCartOpen,
+                    addingToCart,
+                    justAdded,
+                    isCheckingOut,
+                    isRemoving,
+                    toasts,
+                    removeModal,
+                    checkoutModal,
+                    filteredProducts,
+                    cartItems,
+                    totalQuantity,
+                    totalPrice,
+                    loadProducts,
+                    handleImageLoad,
+                    debouncedSearch,
+                    clearSearch,
+                    addToCart,
+                    updateQuantity,
+                    confirmRemoveItem,
+                    closeRemoveModal,
+                    executeRemoveItem,
+                    confirmCheckout,
+                    closeCheckoutModal,
+                    executeCheckout,
+                    openCart,
+                    closeCart,
+                    showToast,
+                    removeToast
+                };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>
