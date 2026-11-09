@@ -1484,6 +1484,24 @@
             color: var(--text-primary);
         }
 
+        .toast-undo {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--radius-sm);
+            padding: 6px 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            flex-shrink: 0;
+        }
+
+        .toast-undo:hover {
+            background: var(--primary-hover);
+            transform: scale(1.05);
+        }
+
         /* ============ Modals ============ */
         .modal-overlay {
             position: fixed;
@@ -1691,6 +1709,14 @@
                         <span v-else>✕</span>
                     </span>
                     <span class="toast-message">{{ toast.message }}</span>
+                    <button
+                        v-if="toast.undoAction"
+                        class="toast-undo"
+                        @click="executeUndo(toast)"
+                        aria-label="撤銷"
+                    >
+                        撤銷
+                    </button>
                     <button class="toast-close" @click="removeToast(toast.id)" aria-label="關閉通知">✕</button>
                 </div>
             </transition-group>
@@ -2146,7 +2172,7 @@
                         <div class="cart-item-actions">
                             <button
                                 class="remove-item-btn"
-                                @click="confirmRemoveItem(item.product)"
+                                @click="removeItem(item.product)"
                                 :aria-label="`移除 ${item.product.name}`"
                             >
                                 移除
@@ -2182,29 +2208,6 @@
                 </button>
             </div>
         </aside>
-
-        <!-- Confirm Remove Modal -->
-        <transition name="fade">
-            <div class="modal-overlay" v-if="removeModal.product" @click.self="closeRemoveModal">
-                <div class="modal">
-                    <div class="modal-header">
-                        <h3 class="modal-title">移除商品</h3>
-                    </div>
-                    <div class="modal-body">
-                        <p class="modal-message">
-                            確定要從購物車移除 <strong>{{ removeModal.product.name }}</strong> 嗎？
-                        </p>
-                    </div>
-                    <div class="modal-footer">
-                        <button class="modal-btn modal-btn-secondary" @click="closeRemoveModal">取消</button>
-                        <button class="modal-btn modal-btn-danger" @click="executeRemoveItem" :disabled="isRemoving">
-                            <span v-if="isRemoving">移除中...</span>
-                            <span v-else>確定移除</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </transition>
     </div>
 
     <script>
@@ -2224,13 +2227,8 @@
                 const addingToCart = ref(null);
                 const justAdded = ref(null);
 
-                const isRemoving = ref(false);
                 const toasts = ref([]);
                 let toastId = 0;
-
-                const removeModal = ref({
-                    product: null
-                });
 
                 // Checkout form state
                 const checkoutForm = ref({
@@ -2428,38 +2426,15 @@
                     cart.value[index].quantity = newQuantity;
                 }
 
-                function confirmRemoveItem(product) {
-                    removeModal.value.product = product;
-                    document.body.style.overflow = 'hidden';
-                }
+                function removeItem(product) {
+                    const index = cart.value.findIndex(item => item.product.id === product.id);
+                    if (index === -1) return;
 
-                function closeRemoveModal() {
-                    removeModal.value.product = null;
-                    document.body.style.overflow = '';
-                }
-
-                async function executeRemoveItem() {
-                    if (!removeModal.value.product || isRemoving.value) return;
-
-                    isRemoving.value = true;
-                    const productId = removeModal.value.product.id;
-
-                    try {
-                        await new Promise(resolve => setTimeout(resolve, 300));
-
-                        const index = cart.value.findIndex(item => item.product.id === productId);
-                        if (index >= 0) {
-                            const name = cart.value[index].product.name;
-                            cart.value.splice(index, 1);
-                            showToast(`已移除 ${name}`, 'success');
-                        }
-                        closeRemoveModal();
-                    } catch (error) {
-                        showToast('移除失敗', 'error');
-                        console.error('Remove failed:', error);
-                    } finally {
-                        isRemoving.value = false;
-                    }
+                    const removedItem = cart.value.splice(index, 1)[0];
+                    showToast(`已移除 ${removedItem.product.name}`, 'success', () => {
+                        cart.value.splice(index, 0, removedItem);
+                        showToast('已撤銷移除', 'success');
+                    });
                 }
 
                 function openCart() {
@@ -2629,13 +2604,13 @@
                     showToast('訂單紀錄功能開發中', 'success');
                 }
 
-                function showToast(message, type = 'success') {
+                function showToast(message, type = 'success', undoAction = null) {
                     const id = ++toastId;
-                    toasts.value.push({ id, message, type });
+                    toasts.value.push({ id, message, type, undoAction });
 
                     setTimeout(() => {
                         removeToast(id);
-                    }, 4000);
+                    }, 5000);
                 }
 
                 function removeToast(id) {
@@ -2649,15 +2624,20 @@
                     }
                 }
 
+                function executeUndo(toast) {
+                    if (toast.undoAction) {
+                        toast.undoAction();
+                        removeToast(toast.id);
+                    }
+                }
+
                 // ============ Lifecycle ============
                 onMounted(() => {
                     loadProducts();
 
                     const handleKeydown = (e) => {
                         if (e.key === 'Escape') {
-                            if (removeModal.value.product) {
-                                closeRemoveModal();
-                            } else if (isCartOpen.value) {
+                            if (isCartOpen.value) {
                                 closeCart();
                             } else if (currentPage.value === 'checkout') {
                                 goBackToCart();
@@ -2704,9 +2684,7 @@
                     isCartOpen,
                     addingToCart,
                     justAdded,
-                    isRemoving,
                     toasts,
-                    removeModal,
                     checkoutForm,
                     errors,
                     isSubmittingOrder,
@@ -2728,9 +2706,7 @@
                     clearSearch,
                     addToCart,
                     updateQuantity,
-                    confirmRemoveItem,
-                    closeRemoveModal,
-                    executeRemoveItem,
+                    removeItem,
                     openCart,
                     closeCart,
                     goToCheckout,
